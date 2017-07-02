@@ -17,11 +17,12 @@ class ModuleController {
         "api"         => 1,
         "idType"      => "documents",
         'ignoreEmpty' => 1,
-        'makeUrl'     => 1,
+        'makeUrl'     => 0,
         'JSONformat'  => "new",
         'display'     => 10,
         'offset'      => 0,
         'sortBy'      => "",
+        'selectFields' => "c.id,c.pagetitle,ld.*",
         'sortDir'     => "desc",
     );
 

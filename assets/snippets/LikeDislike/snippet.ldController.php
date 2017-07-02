@@ -11,7 +11,8 @@ $modx->event->params['prepare'] = trim(implode(",", $prepare), ',');
 
 $params = array_merge(array(
     "controller"    =>  "likedislike",
-    "dir"        =>  "assets/snippets/LikeDislike/DocLister/"
+    "dir"        =>  "assets/snippets/LikeDislike/DocLister/",
+    "selectFields" => "c.*,ld.*"
 ), $modx->event->params);
 if(!class_exists("DLldController", false)){
     class DLldController{
