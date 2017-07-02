@@ -22,8 +22,8 @@ if (($uid && $onlyUsers) || !$onlyUsers) {
     }
 }
 $stat = $ld->stat($rid, $classKey);
-$modx->setPlaceholder('like',$stat['like']);
-$modx->setPlaceholder('dislike',$stat['dislike']);
+$modx->setPlaceholder($classKey.'.like.'.$rid,$stat['like']);
+$modx->setPlaceholder($classKey.'.dislike.'.$rid,$stat['dislike']);
 $tpl = ($ld->isLogged($rid, $classKey) || ($onlyUsers && !$uid)) ? $disabledTpl : $enabledTpl;
 if ($tpl) {
     return DLTemplate::getInstance($modx)->parseChunk($tpl,array(

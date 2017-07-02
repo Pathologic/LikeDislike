@@ -1,6 +1,6 @@
 <?php
-include_once(MODX_BASE_PATH . 'assets/lib/APIHelpers.class.php');   
-    
+include_once(MODX_BASE_PATH . 'assets/lib/APIHelpers.class.php');
+
 $_prepare = explode(",", $prepare);
 $prepare = array();
 $prepare[] = \APIhelpers::getkey($modx->event->params, 'BeforePrepare', '');

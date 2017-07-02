@@ -15,6 +15,8 @@ class likedislikeDocLister extends site_contentDocLister
 
         $ids = array_keys($docs);
         $classKey = $this->getCFGDef('classKey', 'modResource');
+        $onlyUsers = $this->getCFGDef('onlyUsers', 0);
+        $uid = $this->modx->getLoginUserID('web');
         $allowLD = $this->getCFGDef('allowLD',0);
         foreach ($ids as $key => $id) {
             $docs[$id]['like'] = (int)$docs[$id]['like'];
@@ -24,21 +26,27 @@ class likedislikeDocLister extends site_contentDocLister
             if ($allowLD) {
                 $cookieName = md5($classKey . $id);
                 $docs[$id]['ldDisabled'] = 0;
-                if (isset($_COOKIE[$cookieName])) {
-                    if ($docs[$id]['like'] == 0 && $docs[$id]['dislike'] == 0) {
-                        unset($_COOKIE[$cookieName]);
-                        setcookie($cookieName, null, -1, '/');
-                    } else {
-                        $docs[$id]['ldDisabled'] = 1;
-                        unset($ids[$key]);
+                if ($onlyUsers && !$uid) {
+                    $docs[$id]['ldDisabled'] = 1;
+                } else {
+                    if (isset($_COOKIE[$cookieName])) {
+                        if ($docs[$id]['like'] == 0 && $docs[$id]['dislike'] == 0) {
+                            unset($_COOKIE[$cookieName]);
+                            setcookie($cookieName, null, -1, '/');
+                        } else {
+                            $docs[$id]['ldDisabled'] = 1;
+                            unset($ids[$key]);
+                        }
                     }
                 }
+            } else {
+                $docs[$id]['ldDisabled'] = 1;
             }
         }
         if ($allowLD && $ids) {
             $ids = $this->sanitarIn($ids);
             $ip = \APIhelpers::getUserIP();
-            $uid = $this->modx->getLoginUserID('web');
+
             $where = array();
             $where[] = "`rid` IN ({$ids})";
             $where[] = "`classKey`='{$classKey}'";
@@ -113,7 +121,8 @@ class likedislikeDocLister extends site_contentDocLister
             }
             $from = $tbl_site_content . " " . $this->_filters['join'];
             $ld_table = $this->modx->getFullTableName('likedislike');
-            $from .= " LEFT JOIN {$ld_table} `ld` ON `ld`.`rid`=`c`.`id`";
+            $classKey = $this->getCFGDef('classKey','modResource');
+            $from .= " LEFT JOIN {$ld_table} `ld` ON `ld`.`rid`=`c`.`id` AND `ld`.`classKey`='{$classKey}'";
             $where = sqlHelper::trimLogicalOp($where);
 
             $q_true = $q_true ? $q_true : trim($where) != 'WHERE';
@@ -179,13 +188,12 @@ class likedislikeDocLister extends site_contentDocLister
                 }
                 $where .= "c.deleted=0 AND c.published=1";
             }
-
-
             $fields = $this->getCFGDef('selectFields', 'c.*,ld.*');
             $group = $this->getGroupSQL($this->getCFGDef('groupBy'));
             $sort = $this->SortOrderSQL("if(c.pub_date=0,c.createdon,c.pub_date)");
             $ld_table = $this->modx->getFullTableName('likedislike');
-            list($tbl_site_content, $sort) = $this->injectSortByTV("{$tbl_site_content} LEFT JOIN {$ld_table} `ld` ON `ld`.`rid` = `c`.`id` {$this->_filters['join']}",
+            $classKey = $this->getCFGDef('classKey','modResource');
+            list($tbl_site_content, $sort) = $this->injectSortByTV("{$tbl_site_content} LEFT JOIN {$ld_table} `ld` ON `ld`.`rid` = `c`.`id` AND `ld`.`classKey`='{$classKey}' {$this->_filters['join']}",
                 $sort);
 
             $limit = $this->LimitSQL($this->getCFGDef('queryLimit', 0));
@@ -225,7 +233,8 @@ class likedislikeDocLister extends site_contentDocLister
 
         $sort = $this->SortOrderSQL("if(c.pub_date=0,c.createdon,c.pub_date)");
         $ld_table = $this->modx->getFullTableName('likedislike');
-        list($from, $sort) = $this->injectSortByTV("{$tbl_site_content} LEFT JOIN {$ld_table} `ld` ON `ld`.`rid` = `c`.`id` {$this->_filters['join']}",
+        $classKey = $this->getCFGDef('classKey','modResource');
+        list($from, $sort) = $this->injectSortByTV("{$tbl_site_content} LEFT JOIN {$ld_table} `ld` ON `ld`.`rid` = `c`.`id` AND `ld`.`classKey`='$classKey' {$this->_filters['join']}",
             $sort);
         $sanitarInIDs = $this->sanitarIn($this->IDs);
 

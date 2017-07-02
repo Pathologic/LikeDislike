@@ -68,7 +68,8 @@ class likedislike_moduleDocLister extends site_contentDocLister
                 }
             }
             $ld_table = $this->modx->getFullTableName('likedislike');
-            $from = "{$ld_table} `ld` LEFT JOIN {$tbl_site_content} ON `ld`.`rid`=`c`.`id` {$this->_filters['join']}";
+            $classKey = $this->getCFGDef('classKey', 'modResource');
+            $from = "{$ld_table} `ld` LEFT JOIN {$tbl_site_content} ON `ld`.`rid`=`c`.`id` AND `ld`.`classKey`='{$classKey}' {$this->_filters['join']}";
             $where = sqlHelper::trimLogicalOp($where);
 
             $q_true = $q_true ? $q_true : trim($where) != 'WHERE';
@@ -76,8 +77,6 @@ class likedislike_moduleDocLister extends site_contentDocLister
             if (trim($where) != 'WHERE') {
                 $where .= " AND ";
             }
-
-            $whereArr[] = "`ld`.`classKey`='{$this->getCFGDef('classKey','modResource')}'";
 
             $where .= implode(" AND ", $whereArr);
             $where = sqlHelper::trimLogicalOp($where);
@@ -119,7 +118,7 @@ class likedislike_moduleDocLister extends site_contentDocLister
 
             $tbl_site_content = $this->getTable('site_content', 'c');
             if ($sanitarInIDs != "''") {
-                $where .= ($where ? " AND " : "") . "c.id IN ({$sanitarInIDs}) AND `ld`.`classKey`='{$this->getCFGDef('classKey','modResource')}' AND ";
+                $where .= ($where ? " AND " : "") . "c.id IN ({$sanitarInIDs}) AND ";
             }
             $where = sqlHelper::trimLogicalOp($where);
 
@@ -147,7 +146,8 @@ class likedislike_moduleDocLister extends site_contentDocLister
 
             $limit = $this->LimitSQL($this->getCFGDef('queryLimit', 0));
             $ld_table = $this->modx->getFullTableName('likedislike');
-            $rs = $this->dbQuery("SELECT {$fields} FROM {$ld_table} `ld` LEFT JOIN {$tbl_site_content} ON `ld`.`rid`=`c`.`id` {$where} {$group} {$sort} {$limit}");
+            $classKey = $this->getCFGDef('classKey', 'modResource');
+            $rs = $this->dbQuery("SELECT {$fields} FROM {$ld_table} `ld` LEFT JOIN {$tbl_site_content} ON `ld`.`rid`=`c`.`id` AND `ld`.`classKey`='{$classKey}' {$where} {$group} {$sort} {$limit}");
 
             $rows = $this->modx->db->makeArray($rs);
 
@@ -182,7 +182,8 @@ class likedislike_moduleDocLister extends site_contentDocLister
 
         $sort = $this->SortOrderSQL("if(c.pub_date=0,c.createdon,c.pub_date)");
         $ld_table = $this->modx->getFullTableName('likedislike');
-        list($from, $sort) = $this->injectSortByTV("{$ld_table} `ld` LEFT JOIN {$tbl_site_content} ON `ld`.`rid`=`c`.`id` {$this->_filters['join']}", $sort);
+        $classKey = $this->getCFGDef('classKey','modResource');
+        list($from, $sort) = $this->injectSortByTV("{$ld_table} `ld` LEFT JOIN {$tbl_site_content} ON `ld`.`rid`=`c`.`id` AND `ld`.`classKey`='{$classKey}' {$this->_filters['join']}", $sort);
 
         $sanitarInIDs = $this->sanitarIn($this->IDs);
 
@@ -215,7 +216,7 @@ class likedislike_moduleDocLister extends site_contentDocLister
         if (!$this->getCFGDef('showNoPublish', 0)) {
             $where[] = "c.deleted=0 AND c.published=1";
         }
-        $where[] = "`ld`.`classKey`='{$this->getCFGDef('classKey','modResource')}'";
+
         if (!empty($where)) {
             $where = "WHERE " . implode(" AND ", $where);
         } else {
