@@ -22,7 +22,7 @@ class ModuleController {
         'display'     => 10,
         'offset'      => 0,
         'sortBy'      => "",
-        'selectFields' => "c.id,c.pagetitle,ld.*",
+        'selectFields' => "c.id,c.parent,c.pagetitle,ld.*",
         'sortDir'     => "desc",
     );
 
@@ -81,6 +81,25 @@ class ModuleController {
         if (isset($_POST['order']) && in_array(strtoupper($_POST['order']), array("ASC", "DESC"))) {
             $this->dlParams['sortDir'] = $_POST['order'];
         }
+        $this->dlParams['prepare'] = function (
+            array $data = array(),
+            \DocumentParser $modx,
+            \DocLister $_DL,
+            \prepare_DL_Extender $_extDocLister
+        ) {
+            if (($docCrumbs = $_extDocLister->getStore('currentParents' . $data['parent'])) === null) {
+                $modx->documentObject['id'] = $data['id'];
+                $docCrumbs = rtrim($modx->runSnippet('DLcrumbs', array(
+                    'ownerTPL'   => '@CODE:[+crumbs.wrap+]',
+                    'tpl'        => '@CODE: [+title+] /',
+                    'tplCurrent' => '@CODE: [+title+] /',
+                    'hideMain'   => '1'
+                )), ' /');
+                $_extDocLister->setStore('currentParents' . $data['parent'], $docCrumbs);
+            }
+            $data['crumbs'] = "<small>{$docCrumbs}</small><br>";
+            return $data;
+        };
         foreach ($this->dlParams as &$param) {
             if (empty($param)) {
                 unset($param);

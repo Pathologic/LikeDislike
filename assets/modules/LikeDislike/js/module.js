@@ -4,12 +4,12 @@ var columns = [ [
         title:'Название документа',
         sortable:true,
         width:200,
-        formatter: function(value) {
-            return value
+        formatter: function(value,row) {
+            return row.crumbs + '<b>'+value
                 .replace(/&/g, '&amp;')
                 .replace(/>/g, '&gt;')
                 .replace(/</g, '&lt;')
-                .replace(/"/g, '&quot;');
+                .replace(/"/g, '&quot;')+'</b>';
         }
     },
     {
