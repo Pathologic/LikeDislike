@@ -32,7 +32,8 @@ class Model {
             && !$this->isLogged($resourceId, $classKey)
         ) {
             $classKey = $this->modx->db->escape($classKey);
-            $this->modx->db->query("INSERT INTO {$this->table} (`rid`, `classKey`, `like`, `dislike`) VALUES ({$resourceId}, '{$classKey}', 1, 0) ON DUPLICATE KEY UPDATE `like` = `like` + 1");
+            $time = $this->getTime();
+            $this->modx->db->query("INSERT INTO {$this->table} (`rid`, `classKey`, `like`, `dislike`, `updatedon`) VALUES ({$resourceId}, '{$classKey}', 1, 0, '{$time}') ON DUPLICATE KEY UPDATE `updatedon` = '{$time}',`like` = `like` + 1");
             $this->saveLog($resourceId, $classKey);
         }
 
@@ -52,8 +53,11 @@ class Model {
             && !$this->isLogged($resourceId, $classKey)
         ) {
             $classKey = $this->modx->db->escape($classKey);
-            $this->modx->db->query("INSERT INTO {$this->table} (`rid`, `classKey`, `like`, `dislike`) VALUES ({$resourceId}, '{$classKey}', 0, 1) ON DUPLICATE KEY UPDATE `dislike` = `dislike` + 1");
+            $time = $this->getTime();
+            $this->modx->db->query("INSERT INTO {$this->table} (`rid`, `classKey`, `like`, `dislike`,`updatedon`) VALUES ({$resourceId}, '{$classKey}', 0, 1, '{$time}') ON DUPLICATE KEY UPDATE `updatedon`='{$time}',`dislike` = `dislike` + 1");
             $this->saveLog($resourceId, $classKey);
+            if (!isset($_SESSION['likedislike'])) $_SESSION['likedislike'] = array();
+            $_SESSION['likedislike'][$resourceId] = true;
         }
 
         return $this;
@@ -117,13 +121,22 @@ class Model {
         ))->save();
     }
 
+    /**
+     * @return false|string
+     */
+    public function getTime(){
+        return date('Y-m-d H:i:s', time() + $this->modx->config['server_offset_time']);
+    }
+
     public function createTable() {
         $q = "CREATE TABLE IF NOT EXISTS {$this->table} (
             `rid` INT(10) NOT NULL UNIQUE,
             `classKey` VARCHAR(20) NOT NULL DEFAULT '',
             `like` INT(10) NOT NULL DEFAULT 0,
             `dislike` INT(10) NOT NULL DEFAULT 0,
-            UNIQUE KEY `resource`(`rid`, `classKey`)
+            `updatedon` datetime NOT NULL,
+            UNIQUE KEY `resource`(`rid`, `classKey`),
+            KEY `updatedon` (`updatedon`)
             ) Engine=MyISAM
             ";
         $this->modx->db->query($q);

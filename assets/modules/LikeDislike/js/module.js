@@ -13,6 +13,24 @@ var columns = [ [
         }
     },
     {
+        field:'updatedon',
+        width:120,
+        fixed:true,
+        align:'center',
+        title:'Обновлено',
+        sortable:true,
+        formatter:function(value) {
+            sql = value.split(/[- :]/);
+            d = new Date(sql[0], sql[1]-1, sql[2], sql[3], sql[4], sql[5]);
+            year = d.getFullYear();
+            month = d.getMonth()+1;
+            day = d.getDate();
+            hour = d.getHours();
+            min = d.getMinutes();
+            return ('0'+day).slice(-2) + '.' + ('0'+month).slice(-2) + '.' + year + '<br>' + ('0'+hour).slice(-2) + ':' + ('0'+min).slice(-2);
+        }
+    },
+    {
         field:'like',
         width:80,
         fixed:true,
