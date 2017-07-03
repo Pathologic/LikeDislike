@@ -18,11 +18,10 @@ if(!class_exists("DLldController", false)){
     class DLldController{
         public static function prepare(array $data = array(), DocumentParser $modx, $_DocLister, prepare_DL_Extender $_extDocLister){
             $allowLD = $_DocLister->getCFGDef('allowLD',0);
-            if ($allowLD) {
-                $enabledTpl = $_DocLister->getCFGDef('enabledTpl', '');
-                $disabledTpl = $_DocLister->getCFGDef('disabledTpl', '');
-                $data['likedislike'] = $_DocLister->parseChunk($data['ldDisabled'] ? $disabledTpl : $enabledTpl, $data);
-            }
+            $enabledTpl = $_DocLister->getCFGDef('enabledTpl', '');
+            $disabledTpl = $_DocLister->getCFGDef('disabledTpl', '');
+            $data['likedislike'] = $_DocLister->parseChunk($data['ldDisabled'] ? $disabledTpl : $enabledTpl, $data);
+
             return $data;
         }
     }
