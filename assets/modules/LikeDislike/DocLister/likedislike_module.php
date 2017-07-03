@@ -20,10 +20,12 @@ class likedislike_moduleDocLister extends site_contentDocLister
     public function getTable($name, $alias = '')
     {
         $table = parent::getTable($name, $alias);
-        $ld_table = $this->modx->getFullTableName('likedislike');
-        $classKey = $this->getCFGDef('classKey','modResource');
-        $table = "{$ld_table} `ld` LEFT JOIN {$table} ON `ld`.`rid`=`c`.`id` AND `ld`.`classKey` = '{$classKey}'";
-
+        if ($name == 'site_content') {
+            $ld_table = $this->modx->getFullTableName('likedislike');
+            $classKey = $this->getCFGDef('classKey','modResource');
+            $table = "{$ld_table} `ld` LEFT JOIN {$table} ON `ld`.`rid`=`c`.`id` AND `ld`.`classKey` = '{$classKey}'";
+        }
+        
         return $table;
     }
 }
