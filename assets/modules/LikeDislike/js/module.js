@@ -14,7 +14,7 @@ var columns = [ [
     },
     {
         field:'updatedon',
-        width:120,
+        width:100,
         fixed:true,
         align:'center',
         title:'Обновлено',
@@ -44,6 +44,21 @@ var columns = [ [
         fixed:true,
         align:'center',
         title:'<span style="color:red;" class="fa fa-lg fa-thumbs-o-down"></span>',
+        sortable:true
+    },
+    {
+        field:'ld_rating',
+        width:80,
+        fixed:true,
+        align:'center',
+        title:'<span style="color:#9c27b0;" class="fa fa-lg fa-heartbeat"></span>',
+        formatter: function(value) {
+            if (value < 0) {
+                return '<span style="color:red;">' + value + '</span>';
+            } else {
+                return value;
+            }
+        },
         sortable:true
     },
     {

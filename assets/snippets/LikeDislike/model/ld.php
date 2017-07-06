@@ -33,7 +33,7 @@ class Model {
         ) {
             $classKey = $this->modx->db->escape($classKey);
             $time = $this->getTime();
-            $this->modx->db->query("INSERT INTO {$this->table} (`rid`, `classKey`, `like`, `dislike`, `updatedon`) VALUES ({$resourceId}, '{$classKey}', 1, 0, '{$time}') ON DUPLICATE KEY UPDATE `updatedon` = '{$time}',`like` = `like` + 1");
+            $this->modx->db->query("INSERT INTO {$this->table} (`rid`, `classKey`, `like`, `dislike`,`ld_rating`,`updatedon`) VALUES ({$resourceId}, '{$classKey}', 1, 0, 1, '{$time}') ON DUPLICATE KEY UPDATE `updatedon` = '{$time}',`like` = `like` + 1, `ld_rating` = `ld_rating` + 1");
             $this->saveLog($resourceId, $classKey);
         }
 
@@ -54,7 +54,7 @@ class Model {
         ) {
             $classKey = $this->modx->db->escape($classKey);
             $time = $this->getTime();
-            $this->modx->db->query("INSERT INTO {$this->table} (`rid`, `classKey`, `like`, `dislike`,`updatedon`) VALUES ({$resourceId}, '{$classKey}', 0, 1, '{$time}') ON DUPLICATE KEY UPDATE `updatedon`='{$time}',`dislike` = `dislike` + 1");
+            $this->modx->db->query("INSERT INTO {$this->table} (`rid`, `classKey`, `like`, `dislike`,`ld_rating`,`updatedon`) VALUES ({$resourceId}, '{$classKey}', 0, 1, -1, '{$time}') ON DUPLICATE KEY UPDATE `updatedon`='{$time}',`dislike` = `dislike` + 1, `ld_rating` = `ld_rating` - 1");
             $this->saveLog($resourceId, $classKey);
             if (!isset($_SESSION['likedislike'])) $_SESSION['likedislike'] = array();
             $_SESSION['likedislike'][$resourceId] = true;
@@ -78,6 +78,7 @@ class Model {
                 $data = $this->modx->db->getRow($q);
                 $out["like"] = $data['like'];
                 $out["dislike"] = $data['dislike'];
+                $out["ld_rating"] = $data['ld_rating'];
             }
         }
 
@@ -134,9 +135,11 @@ class Model {
             `classKey` VARCHAR(20) NOT NULL DEFAULT '',
             `like` INT(10) NOT NULL DEFAULT 0,
             `dislike` INT(10) NOT NULL DEFAULT 0,
+            `ld_rating` INT(10) NOT NULL DEFAULT 0,
             `updatedon` datetime NOT NULL,
             UNIQUE KEY `resource`(`rid`, `classKey`),
-            KEY `updatedon` (`updatedon`)
+            KEY `updatedon` (`updatedon`),
+            KEY `ld_rating` (`ld_rating`)
             ) Engine=MyISAM
             ";
         $this->modx->db->query($q);

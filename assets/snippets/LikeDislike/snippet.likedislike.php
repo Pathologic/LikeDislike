@@ -27,9 +27,10 @@ $modx->setPlaceholder($classKey.'.dislike.'.$rid,$stat['dislike']);
 $tpl = ($ld->isLogged($rid, $classKey) || ($onlyUsers && !$uid)) ? $disabledTpl : $enabledTpl;
 if ($tpl) {
     return DLTemplate::getInstance($modx)->parseChunk($tpl,array(
-        "rid" => $rid,
-        "like" => $stat['like'],
-        "dislike" => $stat['dislike']
+        "rid"       => $rid,
+        "like"      => $stat['like'],
+        "dislike"   => $stat['dislike'],
+        "ld_rating" => $stat['ld_rating']
     ));
 } else {
     return $stat;
