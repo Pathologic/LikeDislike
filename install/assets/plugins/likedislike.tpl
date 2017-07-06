@@ -4,7 +4,7 @@
  * helper 
  *
  * @category 	plugin
- * @version 	1.1.0
+ * @version 	1.2.0
  * @license 	http://www.gnu.org/copyleft/gpl.html GNU Public License (GPL)
  * @author      Pathologic (m@xim.name)
  * @internal	@properties
