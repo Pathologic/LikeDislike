@@ -24,13 +24,17 @@ if (($uid && $onlyUsers) || !$onlyUsers) {
 $stat = $ld->stat($rid, $classKey);
 $modx->setPlaceholder($classKey.'.like.'.$rid,$stat['like']);
 $modx->setPlaceholder($classKey.'.dislike.'.$rid,$stat['dislike']);
-$tpl = ($ld->isLogged($rid, $classKey) || ($onlyUsers && !$uid)) ? $disabledTpl : $enabledTpl;
+$modx->setPlaceholder($classKey.'.ld_rating.'.$rid,$stat['ld_rating']);
+$disabled = $ld->isLogged($rid, $classKey) || ($onlyUsers && !$uid);
+$modx->setPlaceholder($classKey.'.disabled.'.$rid,(int)$disabled);
+$tpl = $disabled ? $disabledTpl : $enabledTpl;
 if ($tpl) {
     return DLTemplate::getInstance($modx)->parseChunk($tpl,array(
         "rid"       => $rid,
         "like"      => $stat['like'],
         "dislike"   => $stat['dislike'],
-        "ld_rating" => $stat['ld_rating']
+        "ld_rating" => $stat['ld_rating'],
+        "disabled"  => $disabled
     ));
 } else {
     return $stat;
