@@ -12,8 +12,6 @@ class ModuleController {
     public $dlParams = array(
         "controller"  => "likedislike_module",
         "dir" => "assets/modules/LikeDislike/DocLister/",
-        "table"       => "",
-        'idField'     => "",
         "api"         => 1,
         "idType"      => "documents",
         'ignoreEmpty' => 1,
